@@ -1,0 +1,9 @@
+.gen-receipt-modal{
+  .gen-modal-cnt-wrap{
+    height:calc(100% - 59px);
+    text-align:center;
+    > div{
+      width:100%;
+    }
+  }
+}

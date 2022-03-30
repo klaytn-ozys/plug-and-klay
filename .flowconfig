@@ -1,0 +1,27 @@
+[ignore]
+*./test/.*
+<PROJECT_ROOT>/public/.*
+<PROJECT_ROOT>/static/.*
+<PROJECT_ROOT>/config/.*
+<PROJECT_ROOT>/dist/.*
+[include]
+
+[libs]
+<PROJECT_ROOT>/flow-typed
+
+[lints]
+
+[options]
+module.file_ext=.js
+module.file_ext=.scss
+module.name_mapper.extension='scss' -> 'empty/object'
+module.name_mapper='^utils/\(.*\)$' -> '<PROJECT_ROOT>/src/utils/\1'
+module.name_mapper='^components/\(.*\)$' -> '<PROJECT_ROOT>/src/components/\1'
+module.name_mapper='^constants/\(.*\)$' -> '<PROJECT_ROOT>/src/constants/\1'
+module.name_mapper='^containers/\(.*\)$' -> '<PROJECT_ROOT>/src/containers/\1'
+module.name_mapper='^pages/\(.*\)$' -> '<PROJECT_ROOT>/src/pages/\1'
+module.name_mapper='^redux/\(.*\)$' -> '<PROJECT_ROOT>/src/redux/\1'
+module.name_mapper='^enhancers/\(.*\)$' -> '<PROJECT_ROOT>/src/enhancers/\1'
+module.name_mapper='^templates/\(.*\)$' -> '<PROJECT_ROOT>/src/templates/\1'
+
+[strict]
