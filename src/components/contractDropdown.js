@@ -30,8 +30,13 @@ class ContractDropdownUI extends React.Component {
     super(props)
 
     const { blockchain, dropdownLogic, runView } = props
+    let savedConfig
+    
+    try{
+       savedConfig = window.localStorage.getItem(`ipfs/${this.exEnvironment}/${this.networkName}`)
+    }catch(e){
 
-    const savedConfig = window.localStorage.getItem(`ipfs/${this.exEnvironment}/${this.networkName}`)
+    }
 
     this.state = {
       ipfsChecked: savedConfig === 'true',
@@ -91,9 +96,12 @@ class ContractDropdownUI extends React.Component {
         }
         this.exEnvironment = this.blockchain.getProvider()
         this.networkName = name
-
-        const savedConfig = window.localStorage.getItem(`ipfs/${this.exEnvironment}/${this.networkName}`)
-
+        let savedConfig = null
+        
+        try{
+          savedConfig = window.localStorage.getItem(`ipfs/${this.exEnvironment}/${this.networkName}`)
+        }catch(e){}
+        
         // check if an already selected option exist else use default workflow
         if (savedConfig !== null) {
           this.setCheckedState(savedConfig)
@@ -112,7 +120,11 @@ class ContractDropdownUI extends React.Component {
   toggleCheckedState = () => {
     if (this.exEnvironment === 'vm') this.networkName = 'VM'
     this.ipfsCheckedState = !this.ipfsCheckedState
-    window.localStorage.setItem(`ipfs/${this.exEnvironment}/${this.networkName}`, this.ipfsCheckedState)
+    
+    try{
+      window.localStorage.setItem(`ipfs/${this.exEnvironment}/${this.networkName}`, this.ipfsCheckedState)
+    }catch(e){}
+   
   }
 
   updateSelectedContract = (e) => {

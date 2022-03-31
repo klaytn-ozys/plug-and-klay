@@ -4,8 +4,8 @@ import EventManager from '../EventManager'
 const Web3 = require('web3')
 const Caver = require('caver-js')
 
-const BAOBAB_EN = 'https://api.baobab.klaytn.net:8651'
-const CYPRESS_EN = 'https://kaikas.cypress.klaytn.net:8651'
+const BAOBAB_EN = 'https://public-node-api.klaytnapi.com/v1/baobab'
+const CYPRESS_EN = 'https://public-node-api.klaytnapi.com/v1/cypress'
 
 
 let web3
@@ -75,12 +75,14 @@ function ExecutionContext () {
       web3.eth.net.getId((err, id) => {
         let name = null
         if (err) name = 'Unknown'
-        else if (id === 1) name = 'Main'
-        else if (id === 2) name = 'Morden (deprecated)'
-        else if (id === 3) name = 'Ropsten'
-        else if (id === 4) name = 'Rinkeby'
-        else if (id === 5) name = 'Goerli'
-        else if (id === 42) name = 'Kovan'
+        else if (id === 1) name = 'ETH Main'
+        else if (id === 2) name = 'ETH Morden (deprecated)'
+        else if (id === 3) name = 'ETH Ropsten'
+        else if (id === 4) name = 'ETH Rinkeby'
+        else if (id === 5) name = 'ETH Goerli'
+        else if (id === 42) name = 'ETH Kovan'
+        else if (id === 56) name = 'BNB Main'
+        else if (id === 2017) name = 'Orbit Main'
         else if (id === 8217) name = 'Cypress'
         else if (id === 1001) name = 'Baobab'
         else name = 'Custom'
