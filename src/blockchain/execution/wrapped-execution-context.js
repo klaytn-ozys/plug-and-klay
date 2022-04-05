@@ -1,5 +1,6 @@
 import LogsManager from '../logsManager'
 import EventManager from '../EventManager'
+import { loadFromLocalStorage } from '../../utils/EnvUtils'
 
 const Web3 = require('web3')
 const Caver = require('caver-js')
@@ -48,10 +49,29 @@ function ExecutionContext () {
   this.askPermission = function (provider) {
     if (provider === 'injectedWeb3') {
       // metaMask
-      if (window.ethereum && typeof window.ethereum.enable === 'function') window.ethereum.request({ method: 'eth_requestAccounts' })
+      if (window.ethereum && typeof window.ethereum.enable === 'function') return new Promise((resolve, reject) => {
+        window.ethereum.sendAsync({ method: "wallet_requestPermissions", params: [{ eth_accounts: {} }] }, function (err, response) {
+          if (err) {
+            return reject(err)
+          }
+          try {
+            if (response) {
+              let matches = ((response.result[0] || []).caveats || []).find(it => it.type === 'restrictReturnedAccounts')
+    
+              if (matches) {
+                return resolve(matches.value)
+              }
+            }
+          } catch (e) {
+            reject(e)
+          }
+          
+          return reject('NO_ADDRESS')
+        })
+      })
     } else {
       // kaikas
-      if (window.klaytn && typeof window.klaytn.enable === 'function') window.klaytn.enable()
+      if (window.klaytn && typeof window.klaytn.enable === 'function') return window.klaytn.enable()
     }
     
   }
@@ -72,6 +92,8 @@ function ExecutionContext () {
     let provider = this.getProvider()
     if (provider === 'injectedWeb3') {
       web3 = new Web3(injectedProvider)
+      web3.klay = new Proxy(web3.eth, {})
+
       web3.eth.net.getId((err, id) => {
         let name = null
         if (err) name = 'Unknown'
@@ -82,6 +104,7 @@ function ExecutionContext () {
         else if (id === 5) name = 'ETH Goerli'
         else if (id === 42) name = 'ETH Kovan'
         else if (id === 56) name = 'BNB Main'
+        else if (id === 256) name = 'HECO Main'
         else if (id === 2017) name = 'Orbit Main'
         else if (id === 8217) name = 'Cypress'
         else if (id === 1001) name = 'Baobab'
@@ -167,15 +190,29 @@ function ExecutionContext () {
     this.executionContextChange(context, endPointUrl, confirmCb, infoCb)
   }
 
-  this.executionContextChange = (context, endPointUrl, confirmCb, infoCb, cb) => {
+  this.executionContextChange = async (context, endPointUrl, confirmCb, infoCb, cb) => {
     if (!cb) cb = () => {}
+    
+    let oldContext = executionContext;
     
     this.feePayers = []
     if (context === 'injectedWeb3') {
       injectedProvider = window.web3.currentProvider
       web3 = new Web3(injectedProvider)
+      web3.klay = new Proxy(web3.eth, {})
+
       executionContext = context
-      this.askPermission(context)
+      
+      try {
+        let resolved = await this.askPermission(context)
+        
+        if (resolved) {
+          this.event.trigger('addInjectedWeb3Accounts', [resolved])
+        }
+      } catch (e) {
+        console.error(e)
+        return this.executionContextChange(oldContext)
+      }
       
     } else if (context === 'injected') {
       injectedProvider = window.caver ? window.caver.currentProvider : null
@@ -194,7 +231,9 @@ function ExecutionContext () {
         return cb()
       }
     } else {
-      this.caver().klay.accounts.wallet.clear()
+      try{
+        this.caver().klay.accounts.wallet.clear()
+      }catch(e){}
     }
     
     if (context === 'caver') {

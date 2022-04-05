@@ -5,6 +5,7 @@ const ethJSUtil = require('ethereumjs-util')
 const BN = ethJSUtil.BN
 const defaultExecutionContext = require('./wrapped-execution-context')
 const EventManager = require('../EventManager')
+const Web3 = require('web3')
 
 class TxRunner {
   constructor (vmaccounts, api, executionContext) {
@@ -32,9 +33,16 @@ class TxRunner {
     
     run(this, args, timestamp, confirmationCb, gasEstimationForceSend, promptCb, cb)
   }
-
-  _executeTx (tx, gasPrice, isSignedTx, api, promptCb, callback) {
+  
+  _executeTx (tx, gasPrice,gasWeb3, isSignedTx, api, promptCb, callback) {
     if (gasPrice) tx.gasPrice = this.executionContext.web3().utils.toHex(gasPrice)
+    
+    if(this.executionContext.getProvider() === 'injectedWeb3' ){
+      delete tx.type
+      tx.maxFeePerGas = Number(gasWeb3)
+      tx.maxPriorityFeePerGas = Number(gasWeb3)
+    }
+ 
     if (api.personalMode()) {
       promptCb(
         (value) => {
@@ -51,8 +59,8 @@ class TxRunner {
       this._sendTransaction(func, tx, null, callback)
     }
   }
-
-    _sendTransaction (sendTx, tx, pass, callback) {
+  
+  _sendTransaction (sendTx, tx, pass, callback) {
     
     const cb = (err, resp) => {
      
@@ -187,45 +195,53 @@ class TxRunner {
         })
       })
     }
-    
-    this.executionContext.web3().eth.estimateGas(tx, (err, gasEstimation) => {
-      gasEstimationForceSend(err, () => {
-        // callback is called whenever no error
-        tx.gas = !gasEstimation ? gasLimit : (gasEstimation * 2)
-
-        if (this._api.config.getUnpersistedProperty('doNotShowTransactionConfirmationAgain') || this.executionContext.getProvider() === 'injected') {
-          return this._executeTx(tx, null, false, this._api, promptCb, callback)
-        }
-
-        this._api.detectNetwork((err, network) => {
-          if (err) {
-            console.log(err)
-            return
-          }
-
-          confirmCb(network, tx, tx.gas, (gasPrice) => {
-            return this._executeTx(tx, gasPrice, isSignedTx, this._api, promptCb, callback)
-          }, (error) => {
-            callback(error)
-          })
-        })
-      }, () => {
-        const blockGasLimit = this.executionContext.currentblockGasLimit()
-        // NOTE: estimateGas very likely will return a large limit if execution of the code failed
-        //       we want to be able to run the code in order to debug and find the cause for the failure
-        if (err) return callback(err)
-
-        let warnEstimation = ' An important gas estimation might also be the sign of a problem in the contract code. Please check loops and be sure you did not sent value to a non payable function (that\'s also the reason of strong gas estimation). '
-        warnEstimation += ' ' + err
-
-        if (gasEstimation > gasLimit) {
-          return callback('Gas required exceeds limit: ' + gasLimit + '. ' + warnEstimation)
-        }
-        if (gasEstimation > blockGasLimit) {
-          return callback('Gas required exceeds block gas limit: ' + gasLimit + '. ' + warnEstimation)
-        }
+   
+    if (this.executionContext.getProvider() === 'injectedWeb3') {
+      this.executionContext.caver().klay.getGasPrice().then((gas)=>{
+        return this._executeTx(tx, tx.gasPrice,gas, isSignedTx, this._api, promptCb, callback)
       })
-    })
+     
+     
+    } else {
+      this.executionContext.web3().eth.estimateGas(tx, (err, gasEstimation) => {
+        gasEstimationForceSend(err, () => {
+          // callback is called whenever no error
+          tx.gas = !gasEstimation ? gasLimit : (gasEstimation * 2)
+          
+          if (this._api.config.getUnpersistedProperty('doNotShowTransactionConfirmationAgain') || this.executionContext.getProvider() === 'injected') {
+            return this._executeTx(tx, null, false, this._api, promptCb, callback)
+          }
+          
+          this._api.detectNetwork((err, network) => {
+            if (err) {
+              console.log(err)
+              return
+            }
+            
+            confirmCb(network, tx, tx.gas, (gasPrice) => {
+              return this._executeTx(tx, gasPrice, isSignedTx, this._api, promptCb, callback)
+            }, (error) => {
+              callback(error)
+            })
+          })
+        }, () => {
+          const blockGasLimit = this.executionContext.currentblockGasLimit()
+          // NOTE: estimateGas very likely will return a large limit if execution of the code failed
+          //       we want to be able to run the code in order to debug and find the cause for the failure
+          if (err) return callback(err)
+          
+          let warnEstimation = ' An important gas estimation might also be the sign of a problem in the contract code. Please check loops and be sure you did not sent value to a non payable function (that\'s also the reason of strong gas estimation). '
+          warnEstimation += ' ' + err
+          
+          if (gasEstimation > gasLimit) {
+            return callback('Gas required exceeds limit: ' + gasLimit + '. ' + warnEstimation)
+          }
+          if (gasEstimation > blockGasLimit) {
+            return callback('Gas required exceeds block gas limit: ' + gasLimit + '. ' + warnEstimation)
+          }
+        })
+      })
+    }
   }
 }
 

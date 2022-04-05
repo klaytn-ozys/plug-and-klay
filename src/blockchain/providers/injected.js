@@ -3,13 +3,24 @@ const { stripHexPrefix, hashPersonalMessage } = require('ethereumjs-util')
 
 class InjectedProvider {
   
-  constructor (executionContext) {
+  accounts = []
+  
+  constructor (executionContext, pkg) {
     this.executionContext = executionContext
+    
+    if (pkg === 'web3') {
+      executionContext.event.register('addInjectedWeb3Accounts', (accounts) => {
+        if (accounts) {
+          this.accounts = accounts
+        }
+      })
+    }
   }
   
-  getAccounts (cb, context) {
+ async getAccounts (cb, context) {
     if (context === 'injectedWeb3') {
-      return this.executionContext.web3().eth.getAccounts(cb)
+      return cb(null, this.accounts)
+      // return this.executionContext.web3().eth.getAccounts(cb)
     } else if(context === 'injected'){
       return this.executionContext.caver().klay.getAccounts(cb)
     }

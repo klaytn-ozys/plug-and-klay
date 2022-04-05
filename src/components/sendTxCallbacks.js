@@ -73,7 +73,7 @@ const confirmationCb = function (network, tx, gasEstimation, continueTxExecution
           return cb('Unable to retrieve the current network gas price.' + warnMessage + error)
         }
         try {
-          var gasPriceValue = Caver.utils.fromPeb(gasPrice.toString(10), 'gPeb')
+          var gasPriceValue = Caver.utils.fromPeb(gasPrice.toString(10), 'Gpeb')
           cb(null, gasPriceValue)
         } catch (e) {
           cb(warnMessage + e.message, null, false)
@@ -90,7 +90,7 @@ const confirmationCb = function (network, tx, gasEstimation, continueTxExecution
         if (!content.gasPriceStatus) {
           cancelCb('Given gas price is not correct')
         } else {
-          var gasPrice = Caver.utils.toPeb(content.querySelector('#gasprice').value, 'gPeb')
+          var gasPrice = Caver.utils.toPeb(content.querySelector('#gasprice').value, 'GPeb')
           continueTxExecution(gasPrice)
         }
       }

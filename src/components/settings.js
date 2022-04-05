@@ -581,7 +581,7 @@ class SettingsUI extends React.Component {
       await this.setState({
         loadedAccounts: Array.from(
           new Set([
-            ...accounts.filter(it => loadedAccounts.indexOf(it) === -1),
+            ...(accounts || []).filter(it => loadedAccounts.indexOf(it) === -1),
             ...loadedAccounts.filter(it => accounts.indexOf(it) !== -1)
           ])
         ),

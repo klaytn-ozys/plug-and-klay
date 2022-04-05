@@ -81,7 +81,10 @@ class Blockchain {
     this.providers.caver = new NodeProvider(this.executionContext, this.config)
 
     if (window.caver) {
-      this.providers.injected = new InjectedProvider(this.executionContext)
+      this.providers.injected = new InjectedProvider(this.executionContext, 'caver')
+    }
+    if (window.ethereum) {
+      this.providers.injectedWeb3 = new InjectedProvider(this.executionContext, 'web3')
     }
     if (this.vmEnabled) {
       this.providers.vm = new VMProvider(this.executionContext)
@@ -97,9 +100,7 @@ class Blockchain {
   // note: the dual promise/callback is kept for now as it was before
   getAccounts (cb) {
     const provider = this.getProvider()
-    if(provider === 'injectedWeb3'){
-      this.providers.injectedWeb3 = new InjectedProvider(this.executionContext)
-    }
+
     return new Promise((resolve, reject) => {
       this.getCurrentProvider().getAccounts((error, accounts) => {
         if (cb) {
@@ -503,7 +504,9 @@ class Blockchain {
           })
         },
         function applyTxType (fromAddress, value, gasLimit, next) {
-          args.type = args.to ? 'SMART_CONTRACT_EXECUTION' : 'SMART_CONTRACT_DEPLOY'
+          if (self.executionContext.getProvider() !== 'injectedWeb3')
+            args.type = args.to ? 'SMART_CONTRACT_EXECUTION' : 'SMART_CONTRACT_DEPLOY'
+
           next(null, fromAddress, value, gasLimit)
         },
         function runTransaction (fromAddress, value, gasLimit, next) {
