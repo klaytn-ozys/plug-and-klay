@@ -209,7 +209,7 @@ class TxRunner {
           tx.gas = !gasEstimation ? gasLimit : (gasEstimation * 2)
           
           if (this._api.config.getUnpersistedProperty('doNotShowTransactionConfirmationAgain') || this.executionContext.getProvider() === 'injected') {
-            return this._executeTx(tx, null, false, this._api, promptCb, callback)
+            return this._executeTx(tx, null, null, false, this._api, promptCb, callback)
           }
           
           this._api.detectNetwork((err, network) => {
@@ -219,7 +219,7 @@ class TxRunner {
             }
             
             confirmCb(network, tx, tx.gas, (gasPrice) => {
-              return this._executeTx(tx, gasPrice, isSignedTx, this._api, promptCb, callback)
+              return this._executeTx(tx, gasPrice, null, isSignedTx, this._api, promptCb, callback)
             }, (error) => {
               callback(error)
             })

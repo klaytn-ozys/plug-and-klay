@@ -411,8 +411,15 @@ class ContractDropdownUI extends React.Component {
   }
 
   loadFromAddress = async () => {
-    let fileName = (await global.client.fileManager.getCurrentFile() || "/").split('/')[1].split('.')[0]
-    
+    let initFileName = await global.client.fileManager.getCurrentFile() || '/'
+    let fileName
+
+    if(initFileName.includes('/')){
+      fileName = (initFileName).split('/')[1].split('.')[0];
+    }else{
+      fileName = (initFileName).split('.')[0];
+    }
+
     const selectedContract = this.getSelectedContract()
     
     var address = this.atAddressButtonInput.value
