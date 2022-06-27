@@ -42,7 +42,7 @@ class TxRunner {
       tx.maxFeePerGas = Number(gasWeb3)
       tx.maxPriorityFeePerGas = Number(gasWeb3)
     }
- 
+    
     if (api.personalMode()) {
       promptCb(
         (value) => {
@@ -55,7 +55,11 @@ class TxRunner {
       
     } else {
       
-      const func = this.executionContext.web3().eth[isSignedTx ? 'sendSignedTransaction' : 'sendTransaction']
+      let func
+      if (tx.type) 
+        func = this.executionContext.caver().klay[isSignedTx ? 'sendSignedTransaction' : 'sendTransaction']
+      else 
+        func = this.executionContext.web3().eth[isSignedTx ? 'sendSignedTransaction' : 'sendTransaction']
       this._sendTransaction(func, tx, null, callback)
     }
   }
@@ -203,7 +207,12 @@ class TxRunner {
      
      
     } else {
-      this.executionContext.web3().eth.estimateGas(tx, (err, gasEstimation) => {
+      this.executionContext.web3().eth.estimateGas({
+        from:tx.from,
+        to:(tx.to!=="0x"?tx.to:undefined),
+        value:tx.value,
+        data:tx.data
+      }, (err, gasEstimation) => {
         gasEstimationForceSend(err, () => {
           // callback is called whenever no error
           tx.gas = !gasEstimation ? gasLimit : (gasEstimation * 2)

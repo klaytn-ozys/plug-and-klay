@@ -25,7 +25,11 @@ class InjectedProvider {
       return this.executionContext.caver().klay.getAccounts(cb)
     }
   }
-  
+
+  getAccount(address) {
+    return Object.values(this.executionContext.caver().klay.accounts.wallet).find(it => (it.address || '').toLowerCase() === address.toLowerCase())
+  }
+
   newAccount (passwordPromptCb, cb) {
     passwordPromptCb((passphrase) => {
       this.executionContext.caver().personal.newAccount(passphrase, cb)

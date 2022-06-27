@@ -47,6 +47,10 @@ class KENProvider {
     return cb(error, accounts)
   }
 
+  getAccount(address) {
+    return Object.values(this.executionContext.caver().klay.accounts.wallet).find(it => (it.address || '').toLowerCase() === address.toLowerCase())
+  }
+
   newAccount (passwordPromptCb, cb) {
     passwordPromptCb((passphrase, password) => {
       this.importAccount(passphrase, password, cb)

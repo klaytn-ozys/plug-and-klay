@@ -358,7 +358,6 @@ class ContractDropdownUI extends React.Component {
       from: caver.address
     })
 
-    console.log(txMetadata)
     let tx = {
       ...txMetadata,
       value: Caver.utils.toPeb(txMetadata.value, txMetadata.valueDenomination),

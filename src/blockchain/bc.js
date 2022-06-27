@@ -449,11 +449,6 @@ class Blockchain {
     
     if (txFeePayer && txFeePayer.value) {
       feePayerAccount = this.executionContext.getFeePayerAccount(txFeePayer.value)
-      
-      if (txFeePayer.value !== 'none' && Number(txFeeRatio.value) > 0) {
-        this.executionContext.caver().klay.accounts.wallet.clear()
-        this.executionContext.caver().klay.accounts.wallet.add(feePayerAccount.privateKey, feePayerAccount.address)
-      }
     }
     
     if (txFeeRatio && txFeeRatio.value) {
@@ -462,7 +457,8 @@ class Blockchain {
     if (feePayerAccount && feePayerRatio && !args.useCall) {
       return this.runFeeDelegatedTx(feePayerAccount, feePayerRatio, args, confirmationCb, continueCb, promptCb, cb)
     }
-    
+
+    if (this.executionContext.getProvider() === 'injected') this.executionContext.caver().klay.accounts.wallet.clear()
     const self = this
     async.waterfall([
         function getGasLimit (next) {
@@ -737,6 +733,7 @@ class Blockchain {
               gasLimit: gasLimit,
               timestamp: args.data.timestamp,
               type: args.type,
+              feePayer: feePayerAccount.address,
               feeRatio: feePayerRatio
             }
             if (fullDelegated) {
@@ -744,15 +741,26 @@ class Blockchain {
             }
 
             try {
-              const res = await self.executionContext.caver().klay.signTransaction(tx)
-              const result = {
-                senderRawTransaction: res.rawTransaction,
-                feePayer: feePayerAccount.address,
-                type: args.type,
-                from: feePayerAccount.address
+
+              let senderSignedTx
+              if (self.executionContext.getProvider() === 'injected') {
+                senderSignedTx = await self.executionContext.caver().klay.signTransaction(tx)
+                try{
+                    self.executionContext.caver().klay.accounts.wallet.add(feePayerAccount.privateKey, feePayerAccount.address)
+                }catch(e){}
+                senderSignedTx = {
+                  senderRawTransaction: senderSignedTx.rawTransaction,
+                  feePayer: feePayerAccount.address
+                }
+                return resolve([{...tx,...senderSignedTx}, fromAddress, value, gasLimit])
+
+              } else {
+                let account = self.getCurrentProvider().getAccount(fromAddress)
+                senderSignedTx = await account.signTransaction(tx)
+                let feePayerSignedTx = await feePayerAccount.feePayerSignTransaction({senderRawTransaction: senderSignedTx.rawTransaction})
+                senderSignedTx = {senderRawTransaction: feePayerSignedTx.rawTransaction}
+                return resolve([{...tx,...feePayerSignedTx,...senderSignedTx}, fromAddress, value, gasLimit])
               }
-              
-              return resolve([result, fromAddress, value, gasLimit])
             } catch (e) {
               console.log(e)
               throw e
