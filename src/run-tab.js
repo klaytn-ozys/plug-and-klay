@@ -69,10 +69,9 @@ class RunTab extends React.Component {
         try {
           const number = document.querySelector('#value').value
           const select = document.getElementById('unit')
-          const index = select.selectedIndex
-          const selectedUnit = select.querySelectorAll('option')[index].dataset.unit
-          let unit = 'KLAY' // default
-          if (['klay', 'mklay', 'gpeb', 'peb'].indexOf(selectedUnit) >= 0) {
+          const selectedUnit = select.value
+          let unit = 'peb' // default
+          if (['peb', 'Gpeb', 'mKLAY', 'KLAY'].indexOf(selectedUnit) >= 0) {
             unit = selectedUnit
           }
           cb(null, Caver.utils.toPeb(number, unit))

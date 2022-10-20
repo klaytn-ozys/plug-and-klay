@@ -138,9 +138,9 @@ function ValueEl (props) {
              title="Enter the value and choose the unit"/>
       <select name="unit" className={`form-control p-1 ${css.gasNvalUnit} ${css.col2_2} custom-select`} id="unit">
         <option value="peb">peb</option>
-        <option value="gpeb">Gpeb</option>
-        <option value="mklay">mKLAY</option>
-        <option value="klay">KLAY</option>
+        <option value="Gpeb">Gpeb</option>
+        <option value="mKLAY">mKLAY</option>
+        <option value="KLAY">KLAY</option>
       </select>
     </div>
   </div>
