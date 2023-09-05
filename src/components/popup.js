@@ -1,7 +1,7 @@
 /* global Element */
 var yo = require('yo-yo')
 var css = require('../ui/styles/popup-styles')
-var modal = require('./modal-dialog-custom')
+// var modal = require('./modal-dialog-custom')
 
 /**
  * Open a tooltip
@@ -51,9 +51,9 @@ class Displayer {
       const shortTooltipText = (canShorten && tooltipText.length > 201) ? tooltipText.substring(0, 200) + '...' : tooltipText
       this.resolveFn = resolve
 
-      function showFullMessage () {
-        modal.alert(tooltipText)
-      }
+      // function showFullMessage () {
+      //   modal.alert(tooltipText)
+      // }
 
       function closePopup (self) {
         self.hide()

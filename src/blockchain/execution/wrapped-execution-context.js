@@ -1,6 +1,5 @@
 import LogsManager from '../logsManager'
 import EventManager from '../EventManager'
-import { loadFromLocalStorage } from '../../utils/EnvUtils'
 
 const Web3 = require('web3')
 const Caver = require('caver-js')

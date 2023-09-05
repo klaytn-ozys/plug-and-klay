@@ -1,11 +1,10 @@
-'use strict'
 const EthJSTX = require('ethereumjs-tx').Transaction
 const EthJSBlock = require('ethereumjs-block')
 const ethJSUtil = require('ethereumjs-util')
 const BN = ethJSUtil.BN
 const defaultExecutionContext = require('./wrapped-execution-context')
 const EventManager = require('../EventManager')
-const Web3 = require('web3')
+// const Web3 = require('web3')
 
 class TxRunner {
   constructor (vmaccounts, api, executionContext) {
@@ -218,7 +217,7 @@ class TxRunner {
           tx.gas = !gasEstimation ? gasLimit : (gasEstimation * 2)
           
           if (this._api.config.getUnpersistedProperty('doNotShowTransactionConfirmationAgain') || this.executionContext.getProvider() === 'injected') {
-            return this._executeTx(tx, null, null, false, this._api, promptCb, callback)
+            return this._executeTx(tx, null, null,false, this._api, promptCb, callback)
           }
           
           this._api.detectNetwork((err, network) => {

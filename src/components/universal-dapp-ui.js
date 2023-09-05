@@ -10,14 +10,13 @@ import CopyToClipboard from './copy-to-clipboard'
 var $ = require('jquery')
 var yo = require('yo-yo')
 var ethJSUtil = require('ethereumjs-util')
-var BN = ethJSUtil.BN
 var helper = require('../lib/helper')
 var css = require('../universal-dapp-styles')
 var remixLib = require('remix-lib')
 var txFormat = remixLib.execution.txFormat
 const txHelper = remixLib.execution.txHelper
 var txCallBacks = require('./sendTxCallbacks')
-var addTooltip = require('./tooltip')
+
 
 function DecodedResponseTreeView (props) {
   const { response, fnabi } = props
@@ -59,7 +58,7 @@ class UniversalDAppUI extends React.Component {
     super(props)
 
     
-    let { blockchain, contractName, abi, address, created, idx } = props
+    let { blockchain, contractName, abi, address, created } = props
 
     this.blockchain = blockchain
 
@@ -207,7 +206,7 @@ class UniversalDAppUI extends React.Component {
       }
       let calldata = calldataInput.value
       if (calldata) {
-        if (calldata.length < 2 || calldata.length < 4 && helper.is0XPrefixed(calldata)) {
+        if (calldata.length < 2 || (calldata.length < 4 && helper.is0XPrefixed(calldata))) {
           return setLLIError('The calldata should be a valid hexadecimal value with size of at least one byte.')
         } else {
           if (helper.is0XPrefixed(calldata)) {
@@ -281,7 +280,7 @@ class UniversalDAppUI extends React.Component {
           })
         }
         {
-          abi.filter(it => {return it.type === 'function' && it.stateMutability ==='view' || it.stateMutability === 'pure' }).map((funABI ,idx) => {
+          abi.filter(it => {return (it.type === 'function' && it.stateMutability ==='view') || it.stateMutability === 'pure' }).map((funABI ,idx) => {
             return <CallButton key={ `${contractName}_${funABI.name}_${idx}` } decoded={ decoded[funABI.name] } funABI={ funABI } self={ this } />
           })
         }

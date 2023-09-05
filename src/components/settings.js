@@ -20,62 +20,77 @@ function EnvironmentEl (props) {
   const { providers } = self.state
   
   return (
-    <div className={css.crow}>
-      <label id="selectExEnv" className={css.settingsLabel}>Environment</label>
-      <div className={css.environment}>
-        <select id="selectExEnvOptions" data-id="settingsSelectEnvOptions" onChange={onUpdate} ref={ref => self.selectExEnvOptions = ref}
-                className={`form-control ${css.select} custom-select`}>
-          <option id="web3-mode" data-id="settingsWeb3Mode"
-                  title="Execution environment connects to node at localhost (or via IPC if available), transactions will be sent to the network and can cause loss of money or worse!
+		<div className={css.crow}>
+			<label id="selectExEnv" className={css.settingsLabel}>
+				Environment
+			</label>
+			<div className={css.environment}>
+				<select id="selectExEnvOptions" data-id="settingsSelectEnvOptions" onChange={onUpdate} ref={(ref) => (self.selectExEnvOptions = ref)} className={`form-control ${css.select} custom-select`}>
+					<option
+						id="web3-mode"
+						data-id="settingsWeb3Mode"
+						title="Execution environment connects to node at localhost (or via IPC if available), transactions will be sent to the network and can cause loss of money or worse!
               If this page is served via https and you access your node via http, it might not work. In this case, try cloning the repository and serving it via http."
-                  value="baobab" name="executionContext"> Baobab
-          </option>
-          <option id="web3-mode" data-id="settingsWeb3Mode"
-                  title="Execution environment connects to node at localhost (or via IPC if available), transactions will be sent to the network and can cause loss of money or worse!
+						value="baobab"
+						name="executionContext"
+					>
+						{' '}
+						Baobab
+					</option>
+					<option
+						id="web3-mode"
+						data-id="settingsWeb3Mode"
+						title="Execution environment connects to node at localhost (or via IPC if available), transactions will be sent to the network and can cause loss of money or worse!
               If this page is served via https and you access your node via http, it might not work. In this case, try cloning the repository and serving it via http."
-                  value="cypress" name="executionContext"> Cypress
-          </option>
-          {
-            window.caver && (
-              <option id="injected-mode"
-                      title="Execution environment has been provided by Kaikas or similar provider."
-                      value="injected" name="executionContext"> Injected Caver
-              </option>
-            )
-          }
-          <option id="web3-mode" data-id="settingsWeb3Mode"
-                  title="Execution environment connects to node at localhost (or via IPC if available), transactions will be sent to the network and can cause loss of money or worse!
+						value="cypress"
+						name="executionContext"
+					>
+						{' '}
+						Cypress
+					</option>
+					{window.caver && (
+						<option id="injected-mode" title="Execution environment has been provided by Kaikas or similar provider." value="injected" name="executionContext">
+							{' '}
+							Injected Caver
+						</option>
+					)}
+					<option
+						id="web3-mode"
+						data-id="settingsWeb3Mode"
+						title="Execution environment connects to node at localhost (or via IPC if available), transactions will be sent to the network and can cause loss of money or worse!
               If this page is served via https and you access your node via http, it might not work. In this case, try cloning the repository and serving it via http."
-                  value="caver" name="executionContext"> Caver Provider
-          </option>
-          {
-            
-          }
-          <option id="web3-mode" data-id="settingsWeb3Mode"
-                  title="Execution environment connects to node at localhost (or via IPC if available), transactions will be sent to the network and can cause loss of money or worse!
+						value="caver"
+						name="executionContext"
+					>
+						{' '}
+						Caver Provider
+					</option>
+					{}
+					<option
+						id="web3-mode"
+						data-id="settingsWeb3Mode"
+						title="Execution environment connects to node at localhost (or via IPC if available), transactions will be sent to the network and can cause loss of money or worse!
               If this page is served via https and you access your node via http, it might not work. In this case, try cloning the repository and serving it via http."
-                  value="injectedWeb3" name="executionContext"> Injected Web3
-          </option>
-          {
-            providers.map(provider => {
-              return (
-                <option
-                  title={`Manually added environment: ${provider.url}`}
-                  value={provider.name}
-                  name={self.executionContext}
-                >
-                  ${provider.name}
-                </option>
-              )
-            })
-          }
-        </select>
-        <a href="https://remix-ide.readthedocs.io/en/latest/run.html#run-setup" target="_blank">
-          <i className={`${css.infoDeployAction} ml-2 fas fa-info" title="check out docs to setup Environment`}/>
-        </a>
-      </div>
-    </div>
-  )
+						value="injectedWeb3"
+						name="executionContext"
+					>
+						{' '}
+						Injected Web3
+					</option>
+					{providers.map((provider) => {
+						return (
+							<option title={`Manually added environment: ${provider.url}`} value={provider.name} name={self.executionContext}>
+								${provider.name}
+							</option>
+						);
+					})}
+				</select>
+				<a href="https://remix-ide.readthedocs.io/en/latest/run.html#run-setup" rel="noopener noreferrer"  target="_blank">
+					<i className={`${css.infoDeployAction} ml-2 fas fa-info" title="check out docs to setup Environment`} />
+				</a>
+			</div>
+		</div>
+	);
 }
 
 function NetworkEl (props) {
@@ -129,7 +144,6 @@ function GasPriceEl (props) {
 
 function ValueEl (props) {
   const { value, onValueChange } = props
-  
   return <div className={css.crow}>
     <label className={css.settingsLabel}>Value</label>
     <div className={css.gasValueContainer}>
@@ -357,25 +371,35 @@ class SettingsUI extends React.Component {
   }
   
   web3ProviderDialogBody = () => {
-    return <div className="">
-      Note: To use Geth & https://remix.ethereum.org, configure it to allow requests from Remix:(see <a
-      href="https://geth.ethereum.org/docs/rpc/server" target="_blank">Geth Docs on rpc server</a>)
-      <div className="border p-1">geth --rpc --rpccorsdomain https://remix.ethereum.org</div>
-      <br/>
-      To run Remix & a local Geth test node, use this command: (see <a
-      href="https://geth.ethereum.org/getting-started/dev-mode" target="_blank">Geth Docs on Dev mode</a>)
-      <div className="border p-1">{`geth --rpc --rpccorsdomain="${window.origin}" --rpcapi web3,eth,debug,personal,net
-          --vmdebug --datadir ${`<\path/to/local/folder/for/test/chain>`} --dev console`}</div>
-      <br/>
-      <br/>
-      <b>WARNING:</b> It is not safe to use the --rpccorsdomain flag with a wildcard: <b>--rpccorsdomain *</b>
-      <br/>
-      <br/>For more info: <a href="https://remix-ide.readthedocs.io/en/latest/run.html#more-about-web3-provider"
-                             target="_blank">Remix Docs on Web3 Provider</a>
-      <br/>
-      <br/>
-      Web3 Provider Endpoint
-    </div>
+    return (
+			<div className="">
+				Note: To use Geth & https://remix.ethereum.org, configure it to allow requests from Remix:(see{' '}
+				<a href="https://geth.ethereum.org/docs/rpc/server" rel="noopener noreferrer"  target="_blank">
+					Geth Docs on rpc server
+				</a>
+				)<div className="border p-1">geth --rpc --rpccorsdomain https://remix.ethereum.org</div>
+				<br />
+				To run Remix & a local Geth test node, use this command: (see{' '}
+				<a href="https://geth.ethereum.org/getting-started/dev-mode" rel="noopener noreferrer" target="_blank">
+					Geth Docs on Dev mode
+				</a>
+				)
+				<div className="border p-1">{`geth --rpc --rpccorsdomain="${window.origin}" --rpcapi web3,eth,debug,personal,net
+          --vmdebug --datadir ${`<path/to/local/folder/for/test/chain>`} --dev console`}</div>
+				<br />
+				<br />
+				<b>WARNING:</b> It is not safe to use the --rpccorsdomain flag with a wildcard: <b>--rpccorsdomain *</b>
+				<br />
+				<br />
+				For more info:{' '}
+				<a href="https://remix-ide.readthedocs.io/en/latest/run.html#more-about-web3-provider" rel="noopener noreferrer" target="_blank">
+					Remix Docs on Web3 Provider
+				</a>
+				<br />
+				<br />
+				Web3 Provider Endpoint
+			</div>
+		);
   }
   
   setFinalContext = () => {
@@ -395,26 +419,22 @@ class SettingsUI extends React.Component {
     let plusTitle = document.getElementById('remixRunPlusWraper')
 
     switch (this.selectExEnvOptions.value) {
-      case 'injected': {
+      case 'injected': 
         plusBtn.classList.add(css.disableMouseEvents)
         plusTitle.title = 'Unfortunately it\'s not possible to create an account using injected caver. Please create the account directly from your provider (i.e metamask or other of the same type).'
-      }
         break
-      case 'vm': {
+      case 'vm': 
         plusBtn.classList.remove(css.disableMouseEvents)
         plusTitle.title = 'Create a new account'
-      }
         break
       case 'baobab':
-      case 'cypress': {
+      case 'cypress': 
         plusBtn.classList.remove(css.disableMouseEvents)
         plusTitle.title = 'Import your account'
-      }
         break
       case 'caver':
-      case 'web3': {
+      case 'web3': 
         this.onPersonalChange()
-      }
         break
       default:
     }

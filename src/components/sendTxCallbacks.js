@@ -57,7 +57,7 @@ const confirmationCb = function (network, tx, gasEstimation, continueTxExecution
       // TODO: this try catch feels like an anti pattern, can/should be
       // removed, but for now keeping the original logic
       try {
-        var fee = Caver.utils.toBN(tx.gas).mul(Caver.utils.toBN(Caver.utils.toPeb(gasPrice.toString(10), 'gPeb')))
+        var fee = Caver.utils.toBN(tx.gas).mul(Caver.utils.toBN(Caver.utils.toPeb(gasPrice.toString(10), 'Gpeb')))
         txFeeText = ' ' + Caver.utils.fromPeb(fee.toString(10), 'KLAY') + ' KLAY'
         priceStatus = true
       } catch (e) {
@@ -90,7 +90,7 @@ const confirmationCb = function (network, tx, gasEstimation, continueTxExecution
         if (!content.gasPriceStatus) {
           cancelCb('Given gas price is not correct')
         } else {
-          var gasPrice = Caver.utils.toPeb(content.querySelector('#gasprice').value, 'GPeb')
+          var gasPrice = Caver.utils.toPeb(content.querySelector('#gasprice').value, 'Gpeb')
           continueTxExecution(gasPrice)
         }
       }

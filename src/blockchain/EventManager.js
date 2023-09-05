@@ -1,5 +1,3 @@
-'use strict'
-
 function eventManager () {
   this.registered = {}
   this.anonymous = {}

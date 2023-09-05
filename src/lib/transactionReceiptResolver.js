@@ -1,5 +1,3 @@
-'use strict'
-
 module.exports = class TransactionReceiptResolver {
   constructor (blockchain) {
     this._transactionReceipts = {}

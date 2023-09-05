@@ -13,6 +13,7 @@ class DropdownLogic {
     this.editor = editor
     this.runView = runView
 
+    console.log(global.artefacts)
     this.event = new EventManager()
 
     this.listenToCompilationEvents()
@@ -82,7 +83,7 @@ class DropdownLogic {
           try {
             var path = await global.client.fileManager.getCurrentFile()
             
-            var fileName = path + '/artifacts/' + contractName + '.json'
+            // var fileName = path + '/artifacts/' + contractName + '.json'
             
             const content = await global.client.fileManager.getFile(path)
 

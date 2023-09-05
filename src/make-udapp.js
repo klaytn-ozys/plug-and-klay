@@ -18,12 +18,14 @@ export function makeUdapp (blockchain, compilersArtefacts, logHtmlCallback) {
   // TODO: to remove when possible
   blockchain.event.register('transactionBroadcasted', (txhash, networkName) => {
     var txLink = txDetailsLink(networkName, txhash)
-    if (txLink && logHtmlCallback) logHtmlCallback({
-      type: 'html',
-      value: "<a href=" + txLink  + " target='_blank'>" + txLink + "</a>"
-    })
+    // if (txLink && logHtmlCallback) logHtmlCallback(yo`<a href="${txLink}" target="_blank">${txLink}</a>`)
     // TODO 체크해야댐 (logLink?)
-    if (!(txLink && logHtmlCallback)) return
+    if (global.client && global.client.terminal && global.client.terminal.log) {
+      global.client.terminal.log({
+        type: 'log',
+        value: txLink
+      })
+    }
   })
 
   // ----------------- Tx listener -----------------

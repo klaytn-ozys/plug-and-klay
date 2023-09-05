@@ -23,7 +23,7 @@ module.exports = {
       <textarea id="prompt1" autocomplete="off" name='prompt_text' placeholder="keystore" class="${css['prompt_pk']}" >
     </div>`
     let keystorePasswordInput = yo`<div>
-      <textarea id="prompt1" autocomplete="off" name='prompt_text' placeholder="password" class="${css['prompt_pk']}" >
+      <input type="password" id="prompt1" autocomplete="off" name='prompt_text' placeholder="password" class="${css['prompt_pk']}" >
     </div>`
 
     return modalWithTab(['Private Key', 'Keystore'], [yo`<div>${text('Private Key')}<div>${privateKeyInput}</div></div>`, yo`<div>${text('Keystore')}<div>${keystoreInput}</div><div>${keystorePasswordInput}</div></div>`],

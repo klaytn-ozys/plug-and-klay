@@ -44,7 +44,7 @@ class TreeView extends React.Component {
   constructor (props) {
     super(props)
 
-    const { extractData, formatSelf, json, key, expand } = props
+    const { formatSelf, json, key, expand } = props
 
     this.event = new EventManager()
     this.extractData = (item, parent, key) => {

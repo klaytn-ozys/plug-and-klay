@@ -16,7 +16,7 @@ export async function updateCaverKaikas () {
   caver = new Caver(window.klaytn)
 }
 
-function prepareForAxiosCall (url, path = '/') {
+function prepareForAxiosCall (url, path = '/'){
   const parsed = new URL(url)
   const username = parsed.username
   const password = parsed.password
@@ -41,6 +41,7 @@ export async function testUrl (rpcEndpoint) {
     if (rpcEndpoint.startsWith('http')) {
       const [url, config] = prepareForAxiosCall(rpcEndpoint)
       // test with axios because we get more detailed errors back than web3
+      
       await axios.post(url,
         { 'jsonrpc': '2.0', 'method': 'eth_protocolVersion', 'params': [] },
         config)

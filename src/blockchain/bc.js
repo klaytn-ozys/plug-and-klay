@@ -7,7 +7,7 @@ const txFormat = remixLib.execution.txFormat
 const txExecution = remixLib.execution.txExecution
 const typeConversion = remixLib.execution.typeConversion
 const TxRunner = require('./execution/txRunner')
-const TxLogger = require('./execution/txLogger')
+const TxLogger = require('./execution/txLogger');
 const txHelper = remixLib.execution.txHelper
 
 const EventManager = require('./EventManager')
@@ -167,7 +167,7 @@ class Blockchain {
         return cb('Unable to retrieve the current network gas price.' + warnMessage + error)
       }
       try {
-        const gasPriceValue = this.fromPeb(gasPrice, false, 'gPeb')
+        const gasPriceValue = this.fromPeb(gasPrice, false, 'Gpeb')
         cb(null, gasPriceValue)
       } catch (e) {
         cb(warnMessage + e.message, null, false)

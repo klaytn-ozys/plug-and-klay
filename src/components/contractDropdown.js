@@ -4,7 +4,7 @@ import {newContractInstance as newInstanceAction} from '../redux/actions/contrac
 import {connect} from "react-redux";
 import publishToStorage from './publishToStorage'
 import MultiParamManager from './multiParamManager'
-import {select} from 'async'
+
 
 const yo = require('yo-yo')
 
@@ -17,13 +17,13 @@ var confirmDialog = require('./confirmDialog')
 var modalDialog = require('./modaldialog')
 var addTooltip = require('./tooltip')
 
-function IpfsCheckbox (props) {
-  const { checked, changeAction } = props
+// function IpfsCheckbox (props) {
+//   const { checked, changeAction } = props
 
-  return checked === true
-      ? <input id="deployAndRunPublishToIPFS" data-id="contractDropdownIpfsCheckbox" className="mr-2" checked type="checkbox" onChange={ changeAction } />
-      : <input id="deployAndRunPublishToIPFS" data-id="contractDropdownIpfsCheckbox" className="mr-2" type="checkbox" onChange={ changeAction } />
-}
+//   return checked === true
+//       ? <input id="deployAndRunPublishToIPFS" data-id="contractDropdownIpfsCheckbox" className="mr-2" checked type="checkbox" onChange={ changeAction } />
+//       : <input id="deployAndRunPublishToIPFS" data-id="contractDropdownIpfsCheckbox" className="mr-2" type="checkbox" onChange={ changeAction } />
+// }
 
 class ContractDropdownUI extends React.Component {
   constructor (props) {
@@ -50,13 +50,8 @@ class ContractDropdownUI extends React.Component {
     this.dropdownLogic = dropdownLogic
     this.runView = runView
     this.event = new EventManager()
-    this.logCallback = (msg) => {
-      if (typeof msg === 'string') {
-        global.client.terminal.log({ type: 'html', value: msg })
-      } else {
-        global.client.terminal.log(msg)
-      }
-    }
+    this.logCallback = (e) => global.terminalSupported ? global.terminal.logHtml(e) : addTooltip(e)
+
     this.listenToEvents()
     this.ipfsCheckedState = false
     this.exEnvironment = blockchain.getProvider()
@@ -263,20 +258,14 @@ class ContractDropdownUI extends React.Component {
     }
 
     var statusCb = (msg) => {
-      return this.logCallback({
-        value: msg,
-        type: 'html'
-      })
+      return this.logCallback(msg)
     }
 
     var finalCb = (error, contractObject, address) => {
       this.event.trigger('clearInstance')
 
       if (error) {
-        return this.logCallback({
-          value: error,
-          type: 'error'
-        })
+        return this.logCallback(error)
       }
 
       this.props.newInstance({
@@ -305,10 +294,7 @@ class ContractDropdownUI extends React.Component {
             }}, {
             label: 'Cancel',
             fn: () => {
-              this.logCallback({
-                type: 'info',
-                value: `creation of ${selectedContract.name} canceled by user.`
-              })
+              this.logCallback(`creation of ${selectedContract.name} canceled by user.`)
             }
           })
     }

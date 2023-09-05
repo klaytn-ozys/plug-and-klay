@@ -110,5 +110,4 @@ async function initPlugin (client, dispatch) {
   
 }
 
-async function initDev (client) {
-}
+async function initDev(client) {}

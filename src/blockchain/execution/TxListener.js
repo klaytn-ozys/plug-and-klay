@@ -1,4 +1,3 @@
-'use strict'
 import EventManager from '../EventManager'
 import * as defaultExecutionContext from './wrapped-execution-context'
 import {execution} from 'remix-lib'
@@ -8,8 +7,6 @@ const async = require('async')
 const ethers = require('ethers')
 const ethJSUtil = require('ethereumjs-util')
 const codeUtil = require('remix-lib').util
-const raw = require('bel/raw')
-
 /**
  * poll web3 each 2s if web3
  * listen on transaction executed event if VM
@@ -19,7 +16,7 @@ const raw = require('bel/raw')
  */
 class TxListener {
 
-  constructor (opt, executionContext, txLogger) {
+  constructor (opt, executionContext, logger) {
     this.event = new EventManager()
     // has a default for now for backwards compatability
     this.executionContext = executionContext || defaultExecutionContext
@@ -29,8 +26,7 @@ class TxListener {
     this._isListening = false
     this._listenOnNetwork = false
     this._loopId = null
-    this.logger = txLogger
-
+    this.logger = logger;
     this.init()
     this.executionContext.event.register('contextChanged', (context) => {
       if (this._isListening) {
@@ -112,34 +108,6 @@ class TxListener {
     }
   }
 
-  logTx(txData) {
-    let tx = JSON.parse(txData)
-
-    if (tx.resolvedData) {
-      return this.logKnownTx(tx)
-    }
-
-    this.logUnknownTx(tx)
-  }
-
-  logKnownTx(args) {
-    let el = this.logger.logKnownTX(args)
-
-    global.client.terminal.log({
-      type: 'html',
-      value: el
-    })
-  }
-
-  logUnknownTx(args) {
-    let el = this.logger.logUnknownTX(args)
-
-      global.client.terminal.log({
-        type: 'html',
-        value: el
-      })
-  }
-
   log (tx, receipt) {
     var resolvedTransaction = this.resolvedTransaction(tx.hash)
 
@@ -154,19 +122,33 @@ class TxListener {
       }
       global.eventsDecoder.parseLogs(tx, resolvedTransaction.contractName, compiledContracts, (error, logs) => {
         if (!error) {
-          this.logTx(JSON.stringify({
-            tx, receipt, logs, resolvedData: resolvedTransaction
-            //, resolvedData: resolvedTransaction, logs: logs
-          }))
-          // self.logKnownTX({ tx: tx, receipt: receipt, resolvedData: resolvedTransaction, logs: logs })
+          // global.terminalSupported && global.terminal.logTx(JSON.stringify({
+          //   tx, receipt, logs, resolvedData: resolvedTransaction
+          //   //, resolvedData: resolvedTransaction, logs: logs
+          // }))
+          let log = this.logger.logKnownTXAsJSON({ tx: tx, receipt: receipt, resolvedData: resolvedTransaction, logs: logs })
+
+          if (global.client && global.client.terminal && global.client.terminal.log) {
+            global.client.terminal.log({
+              type: 'log',
+              value: JSON.stringify(log, null, 2)
+            })
+          }
         }
       })
     } else {
       // contract unknown - just displaying raw tx.
-      this.logTx(JSON.stringify({
-        tx, receipt
-      }))
-      // self.logUnknownTX({ tx: tx, receipt: receipt })
+      // global.terminalSupported && global.terminal.logTx(JSON.stringify({
+      //   tx, receipt
+      // }))
+      let log = this.logger.logUnknownTXAsJSON({ tx: tx, receipt: receipt })
+
+      if (global.client && global.client.terminal && global.client.terminal.log) {
+        global.client.terminal.log({
+          type: 'log',
+          value: JSON.stringify(log, null, 2)
+        })
+      }
     }
   }
 
@@ -291,7 +273,7 @@ class TxListener {
             tx.provider = this.executionContext.getProvider()
             tx.unit = 'peb'
 
-            return this.logTx(JSON.stringify({tx, receipt, resolvedData}))
+            // return this.logTx(JSON.stringify({tx, receipt, resolvedData}))
           }
 
           try {
